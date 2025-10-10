@@ -77,8 +77,23 @@ def should_include_block(condition: str, responses: Dict[str, Any]) -> bool:
     return False
 
 
-def interactive_survey() -> Dict[str, Any]:
+def interactive_survey(template_path: str) -> Dict[str, Any]:
     """Run interactive survey to collect user preferences."""
+    # Determine language from template path
+    template_name = Path(template_path).stem.lower()
+    
+    if template_name == 'python':
+        return python_survey()
+    elif template_name == 'javascript':
+        return javascript_survey()
+    else:
+        print(f"No interactive survey available for template: {template_name}")
+        print("Please provide a configuration file with --config option")
+        sys.exit(1)
+
+
+def python_survey() -> Dict[str, Any]:
+    """Run interactive survey for Python preferences."""
     print("Python Copilot Instructions Customization")
     print("=" * 45)
     print()
@@ -146,6 +161,89 @@ def interactive_survey() -> Dict[str, Any]:
     return responses
 
 
+def javascript_survey() -> Dict[str, Any]:
+    """Run interactive survey for JavaScript preferences."""
+    print("JavaScript/Node.js Copilot Instructions Customization")
+    print("=" * 55)
+    print()
+    
+    responses = {}
+    
+    # Package Management
+    print("1. Package Management:")
+    print("   a) npm (Node.js default package manager)")
+    print("   b) yarn (fast, reliable package manager)")
+    print("   c) pnpm (efficient disk space package manager)")
+    choice = input("   Choose (a/b/c): ").strip().lower()
+    if choice == 'a':
+        responses['package_manager'] = 'npm'
+    elif choice == 'b':
+        responses['package_manager'] = 'yarn'
+    else:
+        responses['package_manager'] = 'pnpm'
+    print()
+    
+    # Testing Framework
+    print("2. Testing Framework:")
+    print("   a) Jest (popular JavaScript testing framework)")
+    print("   b) Vitest (fast unit testing framework)")
+    print("   c) Mocha (feature-rich testing framework)")
+    choice = input("   Choose (a/b/c): ").strip().lower()
+    if choice == 'a':
+        responses['testing_framework'] = 'jest'
+    elif choice == 'b':
+        responses['testing_framework'] = 'vitest'
+    else:
+        responses['testing_framework'] = 'mocha'
+    print()
+    
+    # Code Formatting
+    print("3. Code Formatting:")
+    print("   a) Prettier (opinionated code formatter)")
+    print("   b) ESLint with --fix (linter with formatting)")
+    choice = input("   Choose (a/b): ").strip().lower()
+    responses['code_formatter'] = 'prettier' if choice == 'a' else 'eslint'
+    print()
+    
+    # Linting
+    print("4. Linting:")
+    print("   a) ESLint (pluggable JavaScript linter)")
+    print("   b) Biome (fast toolchain for web projects)")
+    choice = input("   Choose (a/b): ").strip().lower()
+    responses['linter'] = 'eslint' if choice == 'a' else 'biome'
+    print()
+    
+    # Type Checking
+    print("5. Type Checking:")
+    print("   a) TypeScript (typed superset of JavaScript)")
+    print("   b) JSDoc (documentation comments with type info)")
+    print("   c) None (plain JavaScript)")
+    choice = input("   Choose (a/b/c): ").strip().lower()
+    if choice == 'a':
+        responses['type_checking'] = 'typescript'
+    elif choice == 'b':
+        responses['type_checking'] = 'jsdoc'
+    else:
+        responses['type_checking'] = 'none'
+    print()
+    
+    # Runtime Environment
+    print("6. Runtime Environment:")
+    print("   a) Node.js (server-side JavaScript runtime)")
+    print("   b) Browser (client-side web development)")
+    print("   c) Both (full-stack development)")
+    choice = input("   Choose (a/b/c): ").strip().lower()
+    if choice == 'a':
+        responses['runtime_environment'] = 'nodejs'
+    elif choice == 'b':
+        responses['runtime_environment'] = 'browser'
+    else:
+        responses['runtime_environment'] = 'both'
+    print()
+    
+    return responses
+
+
 def save_responses(responses: Dict[str, Any], output_dir: str) -> None:
     """Save responses to a JSON file for future reference."""
     os.makedirs(output_dir, exist_ok=True)
@@ -185,7 +283,7 @@ def main():
             print(f"Error: Config file not found: {args.config}")
             sys.exit(1)
     else:
-        responses = interactive_survey()
+        responses = interactive_survey(str(template_path))
         
         if args.save_config:
             output_dir = os.path.dirname(args.output)
@@ -203,12 +301,38 @@ def main():
     with open(output_path, 'w', encoding='utf-8') as f:
         f.write(customized_content)
     
-    print(f"Customized instructions saved to: {args.output}")
+    # Basic validation
+    if validate_output(customized_content):
+        print(f"✅ Customized instructions saved to: {args.output}")
+    else:
+        print(f"⚠️  Instructions saved to: {args.output} (with warnings)")
+    
     print()
     print("Next steps:")
     print("1. Review the generated instructions")
     print("2. Commit the file to your repository")
     print("3. GitHub Copilot will automatically use these instructions in VS Code")
+
+
+def validate_output(content: str) -> bool:
+    """Basic validation of the generated content."""
+    warnings = []
+    
+    # Check for unreplaced placeholders
+    import re
+    unreplaced = re.findall(r'\{\{[^}]+\}\}', content)
+    if unreplaced:
+        warnings.append(f"Found unreplaced placeholders: {unreplaced}")
+    
+    # Note: Skipping empty line validation as it's normal with conditional templates
+    
+    if warnings:
+        print("⚠️  Validation warnings:")
+        for warning in warnings:
+            print(f"   - {warning}")
+        return False
+    
+    return True
 
 
 if __name__ == '__main__':

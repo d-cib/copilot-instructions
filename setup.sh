@@ -35,6 +35,7 @@ echo ""
 # Ask user which language they want to customize
 echo "📚 Available templates:"
 echo "  1) Python (python.md)"
+echo "  2) JavaScript/Node.js (javascript.md)"
 echo ""
 read -p "Select template [1]: " template_choice
 template_choice=${template_choice:-1}
@@ -43,6 +44,10 @@ case $template_choice in
     1)
         template="templates/python.md"
         echo "Selected: Python template"
+        ;;
+    2)
+        template="templates/javascript.md"
+        echo "Selected: JavaScript/Node.js template"
         ;;
     *)
         echo "❌ Invalid selection"

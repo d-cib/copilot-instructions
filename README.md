@@ -26,6 +26,15 @@ Customize your Python development experience with preferences for:
 - **Linting**: ruff vs flake8 vs pylint
 - **Type Checking**: mypy vs pyright vs none
 
+### JavaScript/Node.js (`templates/javascript.md`)
+Customize your JavaScript/Node.js development experience with preferences for:
+- **Package Management**: npm vs yarn vs pnpm
+- **Testing Framework**: Jest vs Vitest vs Mocha
+- **Code Formatting**: Prettier vs ESLint --fix
+- **Linting**: ESLint vs Biome
+- **Type Checking**: TypeScript vs JSDoc vs none
+- **Runtime Environment**: Node.js vs Browser vs Both
+
 ## 🛠️ Usage
 
 ### Interactive Customization (Recommended)
