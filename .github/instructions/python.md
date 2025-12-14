@@ -308,6 +308,7 @@ from fidelity_schema import fidelity_schema as schema
 
 - Never commit actual cookies or credentials
 - Use `config/fidelity_cookies.txt` for session storage
+- The `config` directory is listed in `.gitignore` for security.
 - Config directory is gitignored for security
 
 ## Best Practices
